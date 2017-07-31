@@ -31,6 +31,10 @@ public class Player {
         return y + orientation.getDy();
     }
 
+    public int getForwardTwiceX() {return x + 2*orientation.getDx(); }
+
+    public int getForwardTwiceY() {return y + 2*orientation.getDy(); }
+
     public void move(Move move) {
         switch (move) {
             case LEFT:

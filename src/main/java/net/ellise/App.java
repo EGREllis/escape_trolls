@@ -21,7 +21,7 @@ public class App
             terminal.drawMaze(maze, player);
             Move move = terminal.getCommand();
             if (maze.isValid(player, move)) {
-                player.move(move);
+                maze.move(player, move);
             }
         }
         System.out.println("Congratulations, you won!");

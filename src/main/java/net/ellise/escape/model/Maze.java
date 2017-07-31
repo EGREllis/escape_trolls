@@ -33,6 +33,10 @@ public class Maze {
         return maze[y][x];
     }
 
+    private void setSpace(int x, int y, Space space) {
+        maze[y][x] = space;
+    }
+
     private int random(int max) {
         return (int)(Math.random()*max);
     }
@@ -103,6 +107,10 @@ public class Maze {
     }
 
     public boolean isValid(Player player, Move move) {
+        return isValidNormalMove(player, move) || isValidBlockMove(player, move);
+    }
+
+    private boolean isValidNormalMove(Player player, Move move) {
         boolean result = false;
         switch (move) {
             case LEFT:
@@ -117,6 +125,58 @@ public class Maze {
                 break;
         }
         return result;
+    }
+
+    private boolean isValidBlockMove(Player player, Move move) {
+        if (!Move.FORWARD.equals(move)) {
+            return false;
+        }
+        // We are moving forwards
+        int nextX = player.getForwardX();
+        int nextY = player.getForwardY();
+        if (!Space.WALL.equals(getSpace(nextX, nextY))) {
+            return false;
+        }
+        // The block ahead is a wall
+        switch (player.getOrientation()) {
+            case NORTH:
+                if (nextY == 0) {
+                    return false;
+                }
+                break;
+            case SOUTH:
+                if (nextY == getHeight()-1) {
+                    return false;
+                }
+                break;
+            case WEST:
+                if (nextX == 0) {
+                    return false;
+                }
+                break;
+            case EAST:
+                if (nextX == getWidth()-1) {
+                    return false;
+                }
+        }
+        // We will not push a block off the board
+        int afterX = player.getForwardTwiceX();
+        int afterY = player.getForwardTwiceY();
+        return Space.EMPTY.equals(getSpace(afterX, afterY));    // The cell after next is empty
+    }
+
+    public void move(Player player, Move move) {
+        if (isValidNormalMove(player, move)) {
+            player.move(move);
+        } else {
+            int nextX = player.getForwardX();
+            int nextY = player.getForwardY();
+            int afterX = player.getForwardTwiceX();
+            int afterY = player.getForwardTwiceY();
+            setSpace(nextX, nextY, Space.EMPTY);
+            setSpace(afterX, afterY, Space.WALL);
+            player.move(move);
+        }
     }
 
     public boolean isWon(Player player) {
